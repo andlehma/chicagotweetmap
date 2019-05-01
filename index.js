@@ -1,18 +1,29 @@
-var Twitter = require('twitter');
+const Twitter = require('twitter');
+const fs = require('fs');
 require('dotenv').config()
 
-var client = new Twitter({
+const client = new Twitter({
   consumer_key: process.env.CONSUMER_KEY,
   consumer_secret: process.env.CONSUMER_SECRET,
   access_token_key: process.env.ACCESS_TOKEN_KEY,
   access_token_secret: process.env.ACCESS_TOKEN_SECRET
 });
 
-var params = {locations: "-87.939444,41.644583,-87.523333,42.022778"};
-var stream = client.stream('statuses/filter', params);
+const chicago = "-87.939444,41.644583,-87.523333,42.022778";
+const params = {locations: chicago};
+const stream = client.stream('statuses/filter', params);
 
 stream.on('data', function(event) {
-  console.log(event && event.text);
+  if (event.coordinates){
+    console.log(event.coordinates, event.text);
+    fs.readFile('tweets.json', (err, data) => {
+      let json = JSON.parse(data);
+      json.push(event.coordinates.coordinates);
+      fs.writeFile('tweets.json', JSON.stringify(json), (err) => {
+        if (err) throw err;
+      });
+    });
+  }
 });
 
 stream.on('error', function(error) {

@@ -1,5 +1,10 @@
 const Twitter = require('twitter');
 const fs = require('fs');
+const express = require('express');
+const app = express();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+const port = 8000;
 require('dotenv').config()
 
 const client = new Twitter({
@@ -15,17 +20,41 @@ const stream = client.stream('statuses/filter', params);
 
 stream.on('data', function(event) {
   if (event.coordinates){
-    console.log(event.coordinates, event.text);
-    fs.readFile('tweets.json', (err, data) => {
+
+    let coords = event.coordinates.coordinates;
+
+    // write to server console
+    console.log(coords, event.text);
+
+    // write to file
+    let filename = 'static/tweets.json';
+    fs.readFile(filename, (err, data) => {
       let json = JSON.parse(data);
-      json.push(event.coordinates.coordinates);
-      fs.writeFile('tweets.json', JSON.stringify(json), (err) => {
+      json.push(coords);
+      if (json.length > 1000){
+        json.shift();
+      }
+      fs.writeFile(filename, JSON.stringify(json), (err) => {
         if (err) throw err;
       });
     });
+
+    // send to client
+    io.emit('new tweet', coords);
+
   }
 });
 
 stream.on('error', function(error) {
   throw error;
+});
+
+app.use(express.static('static'))
+
+app.get('/', function(req, res){
+  res.sendFile(__dirname + '/index.html');
+});
+
+http.listen(port, function(){
+  console.log('listening on *:' + port);
 });

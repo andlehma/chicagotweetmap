@@ -41,7 +41,6 @@ stream.on('data', function(event) {
 
     // send to client
     io.emit('new tweet', coords);
-
   }
 });
 

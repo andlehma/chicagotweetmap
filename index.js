@@ -34,7 +34,7 @@ stream.on('data', function(event) {
       if (json.length > 1000){
         json.shift();
       }
-      fs.writeFile(filename, JSON.stringify(json), (err) => {
+      fs.writeFile(filename, JSON.stringify(json, null, 2), (err) => {
         if (err) throw err;
       });
     });
@@ -45,7 +45,7 @@ stream.on('data', function(event) {
 });
 
 stream.on('error', function(error) {
-  throw error;
+  console.log(error);
 });
 
 app.use(express.static('static'))

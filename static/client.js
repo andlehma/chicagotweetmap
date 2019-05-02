@@ -46,12 +46,14 @@ let chicagoMaxY = 42.022778;
 let deltaY = chicagoMaxY - chicagoMinY;
 
 function drawDots(){
-  ctx.fillStyle = "rgba(255, 10, 10, 0.3)";
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "rgba(244, 48, 48, 0.3)";
   tweets.forEach(tweet => {
     let tweetX = (1 - (Math.abs(tweet[0]) - chicagoMinX) / deltaX) * canvas.width;
     let tweetY = (1 - (Math.abs(tweet[1]) - chicagoMinY) / deltaY) * canvas.height;
     ctx.beginPath();
-    ctx.arc(tweetX, tweetY, 4, 0, 2 * Math.PI);
+    ctx.arc(tweetX, tweetY, 3, 0, 2 * Math.PI);
     ctx.fill();
   });
 }

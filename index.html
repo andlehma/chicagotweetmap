@@ -14,16 +14,5 @@
   </div>
   <script src="/socket.io/socket.io.js"></script>
   <script src="client.js"></script>
-  <script>
-    // get new tweets
-    const socket = io();
-    socket.on('new tweet', (tweet) => {
-      tweets.push(tweet);
-      if (tweets.length > 1000){
-        tweets.shift();
-      }
-      drawDots();
-    });
-  </script>
 </body>
 </html>

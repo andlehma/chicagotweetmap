@@ -26,34 +26,38 @@ stream.on('data', function(event) {
     // write to server console
     console.log(coords, event.text);
 
-    // write to file
-    let filename = 'static/tweets.json';
-    fs.readFile(filename, (err, data) => {
-      let json = JSON.parse(data);
-      json.push(coords);
-      if (json.length > 1000){
-        json.shift();
+    // only care about tweets with coordinates in Chicago
+    if (coords[0] < -87.523333 && coords[0] > -87.939444 &&
+      coords[1] < 42.022778 && coords[1] > 41.644583){
+        // write to file
+        let filename = 'static/tweets.json';
+        fs.readFile(filename, (err, data) => {
+          let json = JSON.parse(data);
+          json.push(coords);
+          if (json.length > 1000){
+            json.shift();
+          }
+          fs.writeFile(filename, JSON.stringify(json, null, 2), (err) => {
+            if (err) throw err;
+          });
+        });
+
+        // send to client
+        io.emit('new tweet', coords);
       }
-      fs.writeFile(filename, JSON.stringify(json, null, 2), (err) => {
-        if (err) throw err;
-      });
-    });
+    }
+  });
 
-    // send to client
-    io.emit('new tweet', coords);
-  }
-});
+  stream.on('error', function(error) {
+    console.log(error);
+  });
 
-stream.on('error', function(error) {
-  console.log(error);
-});
+  app.use(express.static('static'))
 
-app.use(express.static('static'))
+  app.get('/', function(req, res){
+    res.sendFile(__dirname + '/index.html');
+  });
 
-app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
-});
-
-http.listen(port, function(){
-  console.log('listening on *:' + port);
-});
+  http.listen(port, function(){
+    console.log('listening on *:' + port);
+  });

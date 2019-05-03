@@ -46,7 +46,9 @@ const chicagoMinY = 41.644583;
 const chicagoMaxY = 42.022778;
 const chiDeltaY = chicagoMaxY - chicagoMinY;
 
+let tweetRadius;
 function drawDots(){
+  tweetRadius = (Math.min(iW, iH) * .005) / xyScale;
   let p1 = ctx.transformedPoint(0,0);
   let p2 = ctx.transformedPoint(canvas.width,canvas.height);
   ctx.clearRect(p1.x,p1.y,p2.x-p1.x,p2.y-p1.y);
@@ -56,7 +58,7 @@ function drawDots(){
     let tweetX = (1 - (Math.abs(tweet[0]) - chicagoMinX) / chiDeltaX) * canvas.width;
     let tweetY = (1 - (Math.abs(tweet[1]) - chicagoMinY) / chiDeltaY) * canvas.height;
     ctx.beginPath();
-    ctx.arc(tweetX, tweetY, 3, 0, 2 * Math.PI);
+    ctx.arc(tweetX, tweetY, tweetRadius, 0, 2 * Math.PI);
     ctx.fill();
   });
 }

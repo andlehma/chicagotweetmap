@@ -82,16 +82,15 @@ canvas.addEventListener('DOMMouseScroll',mouseWheelHandler,false);
 canvas.addEventListener('mousewheel', mouseWheelHandler, false);
 function mouseWheelHandler(evt){
   let e = window.event || evt;
+  let delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+  let pt = ctx.transformedPoint(mouse.x, mouse.y);
+  ctx.translate(pt.x, pt.y);
+  let factor = Math.pow(1.1, delta);
+  ctx.scale(factor, factor);
+  xyScale *= factor;
+  ctx.translate(-pt.x, -pt.y);
   if (xyScale < 1){
     ctx.reset();
-  } else {
-    let delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
-    let pt = ctx.transformedPoint(mouse.x, mouse.y);
-    ctx.translate(pt.x, pt.y);
-    let factor = Math.pow(1.1, delta);
-    ctx.scale(factor, factor);
-    xyScale *= factor;
-    ctx.translate(-pt.x, -pt.y);
   }
   ctx.legalize();
   drawDots();
@@ -105,9 +104,9 @@ canvas.addEventListener('mousedown',function(evt){
 
 let xPos = yPos = 0;
 canvas.addEventListener('mousemove',
-function(event) {
-  mouse.x = event.clientX;
-  mouse.y = event.clientY;
+function(evt) {
+  mouse.x = evt.offsetX || (evt.pageX - canvas.offsetLeft);
+  mouse.y = evt.offsetY || (evt.pageY - canvas.offsetTop);
   if (dragStart){
     if (xyScale <= 1){
       ctx.reset();
